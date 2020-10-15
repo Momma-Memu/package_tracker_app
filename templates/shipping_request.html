@@ -6,6 +6,11 @@
     <title>Document</title>
 </head>
 <body>
+	{% if not current_user.is_anonymous %}
+	<form method='POST' action='{{ url_for("logout") }}'>
+		<button>LOG OUT</button>
+	</form>
+	{% endif %}
 	<h1>shipping request form</h1>
 	<form method='post' action='{{ url_for("new_package") }}'>
 		{{ form.csrf_token }}

@@ -6,6 +6,11 @@
     <title>Cool Site</title>
 </head>
 <body>
+	{% if not current_user.is_anonymous %}
+	<form method='POST' action='{{ url_for("logout") }}'>
+		<button>LOG OUT</button>
+	</form>
+	{% endif %}
 	<h1>Package Status</h1>
 	<table>
 		<thead>

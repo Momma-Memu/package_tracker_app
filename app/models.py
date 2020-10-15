@@ -1,80 +1,22 @@
 from flask_sqlalchemy import SQLAlchemy
+from map.map import map, DELIVERED, find_shortest_path, advance_delivery
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 
 db = SQLAlchemy()
-
-
-# A simple graph representing a series of cities and the connections between
-# them.
-
-map = {
-    "Seattle": {"San Francisco"},
-    "San Francisco": {"Seattle", "Los Angeles", "Denver"},
-    "Los Angeles": {"San Francisco", "Phoenix"},
-    "Phoenix": {"Los Angeles", "Denver"},
-    "Denver": {"Phoenix", "San Francisco", "Houston", "Kansas City"},
-    "Kansas City": {"Denver", "Houston", "Chicago", "Nashville"},
-    "Houston": {"Kansas City", "Denver"},
-    "Chicago": {"Kansas City", "New York"},
-    "Nashville": {"Kansas City", "Houston", "Miami"},
-    "New York": {"Chicago", "Washington D.C."},
-    "Washington D.C.": {"Chicago", "Nashville", "Miami"},
-    "Miami": {"Washington D.C.", "Houston", "Nashville"}
-}
-
-DELIVERED = "Delivered"
-
-
-# Use BFS to find the shortest path
-def find_shortest_path(start, end):
-    # Question:  Why is a Python list acceptable to use for this queue?
-    qq = []
-    qq.append([start])
-    visited = set()
-
-    while len(qq) > 0:
-        path = qq.pop()
-        city = path[-1]
-
-        if city == end:
-            return path
-        else:
-            if city not in visited:
-                visited.add(city)
-                for connection in map[city]:
-                    new_path = list(path)
-                    new_path.append(connection)
-                    qq.insert(0, new_path)
-
-    return "Error: Path not found"
-
-
-# Determine the next step via BFS.  Set location to delivered at end.
-def advance_delivery(location, destination):
-    print("advancing", location, destination)
-    # shouldn't be called in this case
-    if location == DELIVERED:
-        return DELIVERED
-    if location == destination:
-        return DELIVERED
-
-    path = find_shortest_path(location, destination)
-    # Safe to say there is a next city if we get here
-    return path[1]
-
-
-# Testing
-# print(find_shortest_path("Seattle", "Kansas City"))
 
 
 class Package(db.Model):
     __tablename__ = 'packages'
 
     id = db.Column(db.Integer, primary_key=True)
-    sender = db.Column(db.String(255))
-    recipient = db.Column(db.String(255))
-    origin = db.Column(db.String(255))
-    destination = db.Column(db.String(255))
-    location = db.Column(db.String(255))
+    sender = db.Column(db.String(255), nullable=False)
+    recipient = db.Column(db.String(255), nullable=False)
+    origin = db.Column(db.String(255), nullable=False)
+    destination = db.Column(db.String(255), nullable=False)
+    location = db.Column(db.String(255), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user = db.relationship('User', back_populates='packages')
 
     @staticmethod
     def advance_all_locations():
@@ -84,3 +26,23 @@ class Package(db.Model):
                 package.location = advance_delivery(package.location, package.destination)
 
         db.session.commit()
+
+class User(db.Model, UserMixin):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(255), nullable=False)
+    hashed_password = db.Column(db.String(100), nullable=False)
+    packages = db.relationship('Package', back_populates='user', lazy=True)
+
+
+    @property
+    def password(self):
+        return self.hashed_password
+
+    @password.setter
+    def password(self, password):
+        self.hashed_password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
