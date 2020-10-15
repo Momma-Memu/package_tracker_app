@@ -1,25 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-	{% if not current_user.is_anonymous %}
-	<form method='POST' action='{{ url_for("logout") }}'>
-		<button>LOG OUT</button>
-	</form>
-	{% endif %}
-	<h1>shipping request form</h1>
-	<form method='post' action='{{ url_for("new_package") }}'>
-		{{ form.csrf_token }}
-		<div>{{ form.sender.label }} {{ form.sender }}</div>
-		<div>{{ form.recipient.label }} {{ form.recipient }}</div>
-		<div>{{ form.origin.label }} {{ form.origin }}</div>
-		<div>{{ form.destination.label }} {{ form.destination }}</div>
-		<div>{{ form.express_shipping.label }} {{ form.express_shipping }}</div>
-		<div>{{ form.submit_button }}</div>
-	</form>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<h1>shipping request form</h1>
+<form method='post' action='{{ url_for("new_package") }}'>
+	{{ form.csrf_token }}
+	<div>{{ form.sender.label }} {{ form.sender }}</div>
+	<div>{{ form.recipient.label }} {{ form.recipient }}</div>
+	<div>{{ form.origin.label }} {{ form.origin }}</div>
+	<div>{{ form.destination.label }} {{ form.destination }}</div>
+	<div>{{ form.express_shipping.label }} {{ form.express_shipping }}</div>
+	<div>{{ form.submit_button }}</div>
+</form>
+{% endblock %}

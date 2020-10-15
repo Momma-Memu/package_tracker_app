@@ -15,6 +15,7 @@ migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view='login'
 
+
 @login.user_loader
 def load_user(id):
     if id:
@@ -24,11 +25,19 @@ def load_user(id):
 
 
 
+# @app.route('/')
+# @login_required
+# def base_route():
+#     print(current_user.id)
+#     packages = Package.query.all()
+#     return render_template('package_status.html', packages=packages)
+
 @app.route('/')
 @login_required
 def base_route():
-    packages = Package.query.all()
+    packages = Package.query.filter(Package.user_id == current_user.id).all()
     return render_template('package_status.html', packages=packages)
+
 
 
 @app.route('/new_package', methods=["GET", "POST"])
@@ -36,6 +45,8 @@ def base_route():
 def new_package():
     form = ShippingForm()
 
+    userId = int(current_user.id)
+    print(userId)
 
     if form.validate_on_submit():
         data = form.data
@@ -45,7 +56,8 @@ def new_package():
             recipient=data["recipient"],
             origin=data["origin"],
             destination=data["destination"],
-            location=data["origin"]
+            location=data["origin"],
+            user_id=userId
             )
         db.session.add(new_package)
         db.session.commit()
@@ -69,6 +81,7 @@ def login():
     return render_template('login.html', form=form)
 
 @app.route('/logout', methods=['POST'])
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('.login'))

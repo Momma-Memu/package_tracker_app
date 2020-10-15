@@ -1,36 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cool Site</title>
-</head>
-<body>
-	{% if not current_user.is_anonymous %}
-	<form method='POST' action='{{ url_for("logout") }}'>
-		<button>LOG OUT</button>
-	</form>
-	{% endif %}
-	<h1>Package Status</h1>
-	<table>
-		<thead>
-			<th>id</th>
-			<th>sender</th>
-			<th>recipient</th>
-			<th>origin</th>
-            <th>destination</th>
-            <th>location</th>
-		</thead>
-			{% for package in packages %}
-            <tr>
-				<td>{{ package.id }}</td>
-				<td>{{ package.sender }}</td>
-				<td>{{ package.recipient }}</td>
-				<td>{{ package.origin }}</td>
-				<td>{{ package.destination }}</td>
-				<td>{{ package.location }}</td>
-			</tr>
-            {% endfor %}
-    </table>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Package Status</h1>
+<table>
+	<thead>
+		<th>id</th>
+		<th>sender</th>
+		<th>recipient</th>
+		<th>origin</th>
+					<th>destination</th>
+					<th>location</th>
+	</thead>
+		{% for package in packages %}
+					<tr>
+			<td>{{ package.id }}</td>
+			<td>{{ package.sender }}</td>
+			<td>{{ package.recipient }}</td>
+			<td>{{ package.origin }}</td>
+			<td>{{ package.destination }}</td>
+			<td>{{ package.location }}</td>
+		</tr>
+					{% endfor %}
+</table>
+{% endblock %}

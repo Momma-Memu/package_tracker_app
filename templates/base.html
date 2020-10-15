@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+        <title>Cool Site</title>
+    </head>
+    <body>
+        {% if not current_user.is_anonymous %}
+        <form method='POST' action='{{ url_for("logout") }}'>
+            <button>LOG OUT</button>
+        </form>
+        {% endif %}
+        <button>
+            <a href='/new_package' class='new_pack_bttn'>NEW PACKAGE</a>
+        </button>
+        <button>
+            <a href='/' class='new_pack_bttn'>MY PACKAGES</a>
+        </button>
+        {% block content %} {% endblock %}
+    </body>
+</html>

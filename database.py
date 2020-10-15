@@ -13,6 +13,9 @@ with app.app_context():
     db.create_all()
 
     user1 = User(username="miah", password="password")
+    user2 = User(username='isaac', password='password')
     package1 = Package(sender='miah', recipient='bob', origin='Houston', destination='Los Angeles', location='Houston', user=user1)
+    package2 = Package(sender='isaac', recipient='bob', origin='Houston', destination='Los Angeles', location='Houston', user=user2)
     db.session.add(package1)
+    db.session.add(package2)
     db.session.commit()
